@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello React</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- compilation JSX => JS -->
+  <script type="text/babel">
+    class App extends React.Component {
+      constructor(props) {
+        super(props)
+      }
+
+      render() {
+        return (
+          <div>
+            <Form />
+          </div>
+        )
+      }
+    }
+
+    class Form extends React.Component {
+      constructor(props) {
+        super(props)
+        this.state = {
+          name: '',
+          users: [],
+          error: ''
+        }
+
+        this.handleChange = this.handleChange.bind(this)
+        this.handleSubmit = this.handleSubmit.bind(this)
+      }
+
+      handleChange(event) {
+        const { name, value } = event.target
+
+        this.setState({ [name]: value.toUpperCase() })
+      }
+
+      handleSubmit(event) {
+        event.preventDefault()
+        if (this.state.name.trim() === '') {
+          this.setState({ error: 'Le nom d\'utilisateur est vide' })
+        } else if (this.state.users.some((user) => user.name === this.state.name)) {
+          this.setState({ error: 'Cet utilisateur existe déjà' })
+        } else {
+          this.setState({ error: '', name: '', users: [...this.state.users, { name: this.state.name }] })
+        }
+      }
+
+      render() {
+        const { name, users, error } = this.state
+
+        return (
+          <React.Fragment>
+            <h2>Créer un utilisateur</h2>
+            <form onSubmit={this.handleSubmit}>
+              {error.length > 0 && <div>{error}</div>}
+              <div>
+                <label>
+                  Username:
+                  <input
+                    type="text"
+                    name="name"
+                    value={name}
+                    onChange={this.handleChange}
+                  />
+                </label>
+              </div>
+              <input type="submit" value="Add user" />
+            </form>
+            <Users users={users} />
+          </React.Fragment>
+        )
+      }
+    }
+
+    class Users extends React.Component {
+      constructor(props) {
+        super(props)
+      }
+
+      render() {
+        const { users } = this.props
+
+        return (
+          <React.Fragment>
+            <h2>Liste des utilisateurs</h2>
+            {users.map((user, i) => (
+              <div key={i}>{user.name}</div>
+            ))}
+          </React.Fragment>
+        )
+      }
+    }
+
+    const container = document.getElementById('root')
+    ReactDOM.render(<App />, container);
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello React</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- compilation JSX => JS -->
+  <script type="text/babel">
+
+    const App = () => {
+      return (
+        <div>
+          <h1>Calculator</h1>
+          <Calculator />
+        </div>
+      )
+    }
+
+    const initialCalculator = { total: 0, number1: '', number2: '', errornumber1: '', errornumber2: '' }
+    const operations = (calculator, action) => {
+      switch (action.type) {
+        case 'add':
+          return { ...calculator, total: calculator.number1 + calculator.number2 }
+        case 'multiply':
+          return { ...calculator, total: calculator.number1 * calculator.number2 }
+        case 'number1':
+        case 'number2':
+          if (parseFloat(action.number) != action.number && action.number !== '') {
+            return { ...calculator, [action.type]: action.number, ['error' + action.type]: `${action.type} is not a number` }
+          } else if (action.number !== '') {
+            return { ...calculator, [action.type]: parseFloat(action.number), ['error' + action.type]: '' }
+          }
+          return { ...calculator, [action.type]: action.number, ['error' + action.type]: '' }
+        case 'reset':
+          return initialCalculator
+        default:
+          return calculator;
+      }
+    }
+
+    const Calculator = () => {
+      const [calculator, dispatch] = React.useReducer(operations, initialCalculator)
+      const { number1, number2, errornumber1, errornumber2, total } = calculator
+
+      const handleChange = (event) => {
+        const { value, name } = event.target
+        dispatch({ type: name, number: value })
+      }
+
+      return (
+        <React.Fragment>
+          <div>{errornumber1}</div>
+          <div>{errornumber2}</div>
+          <div>
+            <label>
+              Number 1 :
+          <input
+                type="text"
+                name="number1"
+                value={number1}
+                onChange={handleChange}
+              />
+            </label>
+            <label>
+              Number 2 :
+          <input
+                type="text"
+                name="number2"
+                value={number2}
+                onChange={handleChange}
+              />
+            </label>
+          </div>
+          <div>
+            <button disabled={errornumber1 !== '' || errornumber2 !== ''} onClick={() => dispatch({ type: 'add' })}>+</button>
+            <button disabled={errornumber1 !== '' || errornumber2 !== ''} onClick={() => dispatch({ type: 'multiply' })}>x</button>
+            <button onClick={() => dispatch({ type: 'reset' })}>Reset</button>
+          </div>
+          <div>
+            Total : {total}
+          </div>
+        </React.Fragment>
+      )
+    }
+
+    const container = document.getElementById('root')
+    ReactDOM.render(<App />, container);
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello React</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- compilation JSX => JS -->
+  <script type="text/babel">
+    const nLines = 10
+    const nStars = 20
+    const symbol = '*'
+    const delay = 500
+
+    class App extends React.Component {
+      constructor(props) {
+        super(props)
+      }
+
+      render() {
+        return (
+          <div>
+            <Lines />
+          </div>
+        );
+      }
+    }
+
+    // AUTRE METHODE
+    // class Lines extends React.Component {
+    //   constructor(props) {
+    //     super(props)
+
+    //     this.interval = null
+    //     this.state = {
+    //       lines: [],
+    //       stars: [],
+    //     }
+    //   }
+
+    //   componentDidMount() {
+    //     this.interval = setInterval(() => {
+    //       this.setState({ stars: this.state.stars.length === nStars - 1 ? [] : [...this.state.stars, symbol] })
+    //     }, delay)
+    //   }
+
+    //   componentDidUpdate(prevProps, prevStates) {
+    //     if (this.state.stars !== prevStates.stars && this.state.stars.length === 0) {
+    //       this.setState({ lines: [...this.state.lines, 'l'] })
+    //     }
+    //     if (this.state.lines !== prevStates.lines && this.state.lines.length === nLines) {
+    //       clearInterval(this.interval)
+    //     }
+    //   }
+
+    //   componentWillUnmount() {
+    //     clearInterval(this.interval)
+    //   }
+
+    //   render() {
+    //     const { lines, stars } = this.state
+
+    //     return (
+    //       <div>
+    //         {lines.map((val, i) => <div key={i}>{symbol.repeat(nStars)}</div>)}
+    //         <div>{stars.map((val) => val)}</div>
+    //       </div>
+    //     );
+    //   }
+    // }
+
+    class Lines extends React.Component {
+      constructor(props) {
+        super(props)
+
+        this.state = {
+          lines: 'l'.repeat(nLines).split(''),
+        }
+      }
+
+      render() {
+        const { lines } = this.state
+
+        return (
+          <div>
+            {lines.map((val, i) => <Line key={i} number={i} />)}
+          </div>
+        );
+      }
+    }
+
+    class Line extends React.Component {
+      constructor(props) {
+        super(props)
+
+        this.interval = null
+        this.state = {
+          stars: [],
+        }
+      }
+
+      componentDidMount() {
+        setTimeout(() => {
+          this.interval = setInterval(() => {
+            this.setState({ stars: [...this.state.stars, symbol] })
+          }, delay)
+        }, delay * 20 * this.props.number)
+      }
+
+      componentDidUpdate(prevProps, prevStates) {
+        if (this.state.stars !== prevStates.stars && this.state.stars.length === nStars) {
+          clearInterval(this.interval)
+        }
+      }
+
+      componentWillUnmount() {
+        clearInterval(this.interval)
+      }
+
+      render() {
+        const { stars } = this.state
+
+        return (
+          <div>{stars.map((val) => val)}</div>
+        );
+      }
+    }
+
+    const container = document.getElementById('root')
+    ReactDOM.render(<App />, container);
+
+  </script>
+</body>
+
+</html>

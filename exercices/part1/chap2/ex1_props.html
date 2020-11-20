@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello React</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+  <!-- babel => compilation du JSX -->
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  <style>
+    .heading {
+      color: purple;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+
+    class App extends React.Component {
+      render() {
+        const messages = ["Hello React !", "Aujourd'hui on est lundi", "JSX c'est mieux !"]
+        return (
+          <div>
+            <Messages messages={messages} />
+          </div>
+        )
+      }
+    }
+
+    class Messages extends React.Component {
+      render() {
+        const { messages } = this.props
+        return (
+          <div>
+            <div>Messages : </div>
+            <ul>
+              {messages.map((message, i) => {
+                return (
+                  <li key={i} >
+                    <Message message={message} />
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )
+      }
+    }
+
+    class Message extends React.Component {
+      render() {
+        const { message } = this.props
+        return (
+          <span>
+            {message}
+          </span>
+        )
+      }
+    }
+
+    ReactDOM.render(
+      <App />,
+      document.getElementById('root')
+    );
+  </script>
+</body>
+
+</html>

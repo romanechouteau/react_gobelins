@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello React</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- compilation JSX => JS -->
+  <script type="text/babel">
+    const bases = { decimal: 'Décimal', binary: 'Binaire' }
+
+    class App extends React.Component {
+      constructor(props) {
+        super(props)
+
+        this.state = {
+          number: ''
+        }
+
+        this.handleChange = this.handleChange.bind(this)
+      }
+
+      handleChange(event, error) {
+        const { value, name } = event
+        this.setState({ number: name === 'binary' && !isNaN(parseInt(value)) && error === '' ? parseInt(value, 2) : value })
+      }
+
+      render() {
+        const { number } = this.state
+        return (
+          <div>
+            <BaseNumberInput onChangeBase={(event, error) => this.handleChange(event, error)} base="decimal" number={number} />
+            <BaseNumberInput onChangeBase={(event, error) => this.handleChange(event, error)} base="binary" number={number} />
+          </div>
+        )
+      }
+    }
+
+    class BaseNumberInput extends React.Component {
+      constructor(props) {
+        super(props)
+        this.state = {
+          error: ''
+        }
+
+        this.handleChange = this.handleChange.bind(this)
+      }
+
+      handleChange(event) {
+        const { value, name } = event.target
+        let error = ''
+
+        if (value.length > 0 && isNaN(parseInt(value))) {
+          error = 'Ce n\'est pas un nombre.'
+        } else if (name === 'binary' && /[^01]/.test(value)) {
+          error = 'Ce n\'est pas un nombre binaire.'
+        } else {
+          error = ''
+        }
+        this.setState({ error })
+        this.props.onChangeBase(event.target, error)
+      }
+
+      render() {
+        const { error } = this.state
+        const { number, base } = this.props
+
+        return (
+          <React.Fragment>
+            {error.length > 0 && <div>{error}</div>}
+            <div>
+              <label>
+                {bases[base]} :
+                  <input
+                  type="text"
+                  name={base}
+                  value={base === 'binary' && !isNaN(parseInt(number)) && error === '' ? parseInt(number, 10).toString(2) : number}
+                  onChange={this.handleChange}
+                />
+              </label>
+            </div>
+          </React.Fragment>
+        )
+      }
+    }
+
+    const container = document.getElementById('root')
+    ReactDOM.render(<App />, container);
+
+  </script>
+</body>
+
+</html>

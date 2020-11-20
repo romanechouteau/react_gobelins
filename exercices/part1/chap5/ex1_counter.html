@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello React</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- compilation JSX => JS -->
+  <script type="text/babel">
+    const time = 1000
+    const max = 20
+
+    class App extends React.Component {
+      constructor(props) {
+        super(props)
+      }
+
+      render() {
+        return (
+          <div>
+            <Counter step={1} />
+            <Counter step={2} />
+            <Counter step={1} cyclical={true} />
+            <Counter step={1} binary={true} />
+          </div>
+        );
+      }
+    }
+
+    class Counter extends React.Component {
+      constructor(props) {
+        super(props)
+
+        this.interval = null
+        this.state = {
+          count: 0,
+          start: false
+        }
+        this.startCount = this.startCount.bind(this)
+        this.stopCount = this.stopCount.bind(this)
+        this.resetCount = this.resetCount.bind(this)
+      }
+
+      plusCount() {
+        this.setState({ count: this.state.count + this.props.step })
+      }
+
+      startCount() {
+        if (this.state.count < max) {
+          this.interval = setInterval(() => {
+            this.plusCount()
+          }, time)
+          this.setState({ start: true })
+        }
+      }
+
+      stopCount() {
+        clearInterval(this.interval)
+        this.setState({ start: false })
+      }
+
+      resetCount() {
+        this.setState({ count: 0 })
+      }
+
+      componentDidUpdate(prevProps, prevStates) {
+        if (this.state.count !== prevStates.count && this.state.count >= max) {
+          if (this.props.cyclical === true) {
+            this.resetCount()
+          } else {
+            this.stopCount()
+          }
+        }
+      }
+
+      componentWillUnmount() {
+        clearInterval(this.interval)
+        this.setState({ start: false })
+      }
+
+      render() {
+        const { count, start } = this.state
+        const { step, binary } = this.props
+
+        return (
+          <div>
+            <button disabled={this.state.start} onClick={this.startCount}>Start (+ {step})</button>
+            <button disabled={!this.state.start} onClick={this.stopCount}>Stop</button>
+            {this.state.count > 0 && (<button onClick={this.resetCount}>Reset</button>)}
+            <div>{binary ? parseInt(count, 10).toString(2) : count}</div>
+          </div>
+        );
+      }
+    }
+
+    const container = document.getElementById('root')
+    ReactDOM.render(<App />, container);
+
+  </script>
+</body>
+
+</html>
